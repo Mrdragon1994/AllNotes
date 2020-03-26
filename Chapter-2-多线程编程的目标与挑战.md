@@ -219,12 +219,183 @@ tags:
           
           - 需要注意的是：volatile只能够保证写操作的原子性(其实是针对long和double的，因为其他类型的写操作都是原子性的)，但是其他基本类型和引用类型的写操作都是原子性的（其中引用类型的写操作其实就是赋值操作）。但是所有的读操作都是原子性的。
             
+          ```java
+            package com.thread.chapter2
           
+            /**
+             * @Author ChangQilong
+             * @Date 2020/3/26 23:15
+             */
+            class TestAtom {
             
-          
+                public static void main(String[] args) {
+                    AtomicityDemo atomicityDemo = new AtomicityDemo()
+                    Thread thread = new Thread() {
+                        @Override
+                        void run() {
+            
+                            atomicityDemo.updateHostInfo("123", 12)
+            
+                        }
+                    }
+            
+                    Thread thread1 = new Thread() {
+                        @Override
+                        void run() {
+                            sleep(100) //重点①
+                            atomicityDemo.connect()
+                        }
+                    }
+            
+                    thread.start()
+                    thread1.start()
+                }
+            
+            }
+            
+            class AtomicityDemo {
+            
+                private HostInfo hostInfo
+            
+                public void updateHostInfo(String ip, int port) {
+                    HostInfo hostInfo1 = new HostInfo(ip, port)
+                    hostInfo = hostInfo1
+                }
+            
+                public void connect() {
+                    println(hostInfo.getIp())
+                }
+            
+            
+            }
+            
+            class HostInfo {
+                private String ip
+                private int port
+            
+                HostInfo() {
+                }
+            
+                HostInfo(String ip, int port) {
+                    this.ip = ip
+                    this.port = port
+                }
+            
+                String getIp() {
+                    return ip
+                }
+            
+                void setIp(String ip) {
+                    this.ip = ip
+                }
+            
+                int getPort() {
+                    return port
+                }
+            
+                void setPort(int port) {
+                    this.port = port
+                }
+            }
+            ```
             
             
             
+            以上代码，首先两个线程共享了同一个对象的同一份变量,线程1去赋值，线程2去读值，因此要考虑线程1和2的执行先后顺序，不然读值的那个线程读到的就是null。
+            
+            
+            
+            ```java
+            package com.thread.chapter2
+            
+            /**
+             * @Author ChangQilong* @Date 2020/3/26 23:15
+             */
+            class TestAtom {
+            
+                public static void main(String[] args) {
+                    AtomicityDemo atomicityDemo = new AtomicityDemo()
+            
+                    Thread thread = new Thread() {
+                        @Override
+                        void run() {
+                            atomicityDemo.updateHostInfo("123", 12)
+                        }
+                    }
+            
+                    Thread thread1 = new Thread() {
+                        @Override
+                        void run() {
+                            //sleep(500) //步骤5
+                            atomicityDemo.connect()
+                        }
+                    }
+                    thread.start()
+                    thread1.start()
+                }
+            }
+            
+            class AtomicityDemo {
+            
+                private HostInfo hostInfo = new HostInfo()
+            
+            
+                public void updateHostInfo(String ip, int port) {
+                    hostInfo.setIp(ip)  //步骤1
+                    hostInfo.setPort(port) //步骤2
+                }
+            
+            
+                public void connect() {
+                    println(hostInfo.getIp()) //步骤3
+                    println(hostInfo.getPort()) //步骤4
+                }
+            
+                static class HostInfo {
+                    private String ip
+                    private int port
+                    private static aaa
+            
+                    HostInfo() {
+                    }
+            
+                    HostInfo(String ip, int port) {
+                        this.ip = ip
+                        this.port = port
+                    }
+            
+                    String getIp() {
+                        return ip
+                    }
+            
+                    void setIp(String ip) {
+                        this.ip = ip
+                    }
+            
+                    int getPort() {
+                        return port
+                    }
+            
+                    void setPort(int port) {
+                        this.port = port
+                    }
+                }
+            
+            }
+            ```
+            
+            
+            
+            由于赋值线程和取值线程会一起运行，因此步骤1和2就不能保证在步骤3和4的前面，因此可能读到的值是null,0；如果让线程2 sleep(X)一定时间(步骤5)，让赋值函数去走完，那么取值函数便能取到正确结果；
+            
+            ```java
+            //取值线程不sleep()的输出
+            null
+            12
+            //取值线程sleep()一定时间
+            123
+            12
+            ```
+            
+            **PS**这里需要注意的是：第32行，需要手动调用无参构造器，不然HostInfo()是可以调用其静态属性的，但是该类不会初始化，也就是hostinfo的引用是null。
    
-      
-
