@@ -1,14 +1,4 @@
----
-title: Chapter 3 Java线程同步机制
-date: 2020-03-24 21:12:19
-categories:
-- 多线程
-- Java
-- Java多线程编程实战指南
-tags:
-- 线程
-- Java
----
+- 
 
 [toc]
 
@@ -66,4 +56,4 @@ tags:
 
 
 
-![[公式]](E:\Blog\source\_posts\equation.svg)
+![[公式]](./_posts/equation.svg)
