@@ -55,5 +55,3 @@
 
 
 
-
-![[公式]](./_posts/equation.svg)
