@@ -62,7 +62,8 @@ tags:
 
 
 
-![[公式]](E:%5CBlog%5Csource%5C_posts%5CChapter-3-Java%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%9C%BA%E5%88%B6.assets%5Cequation.svg)
 
 
 
+
+![[公式]](E:\Blog\source\_posts\equation.svg)
